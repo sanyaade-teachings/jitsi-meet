@@ -17,3 +17,17 @@ export const notifyTranscriptionChunkReceived = (transcriptMessageID: string, la
         participant,
         ...text
     });
+
+/**
+ * Calculates the font size for the subtitles.
+ *
+ * @param {number} clientHeight - The height of the visible area of the window.
+ * @returns {number}
+ */
+export function calculateSubtitlesFontSize(clientHeight?: number) {
+    if (typeof clientHeight === 'undefined') {
+        return 16;
+    }
+
+    return Math.max(Math.floor(clientHeight * 0.04), 16);
+}
