@@ -11,7 +11,7 @@ import {
 } from '../../../base/participants/functions';
 import { withPixelLineHeight } from '../../../base/styles/functions.web';
 import { getLargeVideoParticipant } from '../../../large-video/functions';
-import { isToolboxVisible } from '../../../toolbox/functions.web';
+import { getTransitionParamsForElementsAboveToolbox, isToolboxVisible } from '../../../toolbox/functions.web';
 import { isLayoutTileView } from '../../../video-layout/functions.web';
 
 import DisplayNameBadge from './DisplayNameBadge';
@@ -23,8 +23,8 @@ const useStyles = makeStyles()(theme => {
             alignItems: 'center',
             display: 'inline-flex',
             justifyContent: 'center',
-            marginBottom: theme.spacing(7),
-            transition: 'margin-bottom 0.3s',
+            marginBottom: theme.spacing(6),
+            transition: `margin-bottom ${getTransitionParamsForElementsAboveToolbox(false)}`,
             pointerEvents: 'none',
             position: 'absolute',
             bottom: 0,
@@ -33,7 +33,8 @@ const useStyles = makeStyles()(theme => {
             zIndex: 1
         },
         containerElevated: {
-            marginBottom: theme.spacing(12)
+            marginBottom: theme.spacing(12),
+            transition: `margin-bottom ${getTransitionParamsForElementsAboveToolbox(false)}`
         }
     };
 });

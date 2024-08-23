@@ -6,6 +6,7 @@ import { withStyles } from 'tss-react/mui';
 import { IReduxState } from '../../../app/types';
 import { getLocalParticipant } from '../../../base/participants/functions';
 import { getLargeVideoParticipant } from '../../../large-video/functions';
+import { getTransitionParamsForElementsAboveToolbox, isToolboxVisible } from '../../../toolbox/functions.web';
 import { isLayoutTileView } from '../../../video-layout/functions.web';
 import { calculateSubtitlesFontSize } from '../../functions.web';
 import {
@@ -27,6 +28,11 @@ interface IProps extends IAbstractCaptionsProps {
     _isLifted: boolean | undefined;
 
     /**
+     * Whether the toolbox is visible or not.
+     */
+    _toolboxVisible: boolean;
+
+    /**
      * An object containing the CSS classes.
      */
     classes?: Partial<Record<keyof ReturnType<typeof styles>, string>>;
@@ -34,14 +40,26 @@ interface IProps extends IAbstractCaptionsProps {
 
 
 const styles = (_theme: Theme, props: IProps) => {
-    const { _isLifted = false, _clientHeight } = props;
+    const { _isLifted = false, _clientHeight, _toolboxVisible = false } = props;
 
     const toolbarSize = 48;
     const fontSize = calculateSubtitlesFontSize(_clientHeight);
+    let bottom = 40;
+    const padding = Math.ceil(0.2 * fontSize);
+
+    // This is the case where we display the onstage participant display name
+    // below the subtitles.
+    if (_isLifted) {
+        bottom += 36 + padding; // 36px is the height
+    }
+
+    if (_toolboxVisible) {
+        bottom += toolbarSize;
+    }
 
     return {
         transcriptionSubtitles: {
-            bottom: _isLifted ? `${toolbarSize + 36 + 40}px` : `${toolbarSize + 40}px`,
+            bottom: `${bottom}px`,
             fontSize: `${fontSize}px`,
             left: '50%',
             maxWidth: '50vw',
@@ -56,13 +74,14 @@ const styles = (_theme: Theme, props: IProps) => {
             transform: 'translateX(-50%)',
             zIndex: 7,
             lineHeight: 1.2,
+            transition: `bottom ${getTransitionParamsForElementsAboveToolbox(_toolboxVisible)}`,
 
             span: {
                 color: '#fff',
                 background: 'black',
 
                 // without this when the text is wrapped on 2+ lines there will be a gap in the background:
-                padding: `${0.2 * fontSize}px 0px`
+                padding: `${Math.ceil(0.2 * fontSize)}px 0px`
             }
         }
     };
@@ -128,7 +147,8 @@ function mapStateToProps(state: IReduxState) {
     return {
         ..._abstractMapStateToProps(state),
         _isLifted: Boolean(largeVideoParticipant && largeVideoParticipant?.id !== localParticipant?.id && !isTileView),
-        _clientHeight: clientHeight
+        _clientHeight: clientHeight,
+        _toolboxVisible: isToolboxVisible(state)
     };
 }
 
